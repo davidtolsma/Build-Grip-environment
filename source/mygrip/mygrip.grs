@@ -1,0 +1,90 @@
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+$$									$$
+$$	PROGRAM: camlobespl						$$
+$$									$$
+$$	DESCRIPTION: This GRIP program is intended to test the reading	$$
+$$		of a data file of cam lobe X,Y points and creating the	$$
+$$		points and spline that go with it. It makes use of the	$$
+$$		procedure 'readdacsfile'.				$$
+$$									$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+$$									$$
+$$	FILE:	camlobespl.grs						$$
+$$									$$
+$$	AUTHOR:	Frank Schipperijn					$$
+$$									$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+$$
+$$	DECLARE ALL REAL VARIABLES 
+	GRIPSW/ DECLRV
+
+$$	
+$$	DECLARATION AND INITIALIZATION
+$$	
+	STRING/ filename(256)
+	NUMBER/ numpts,xarray(3000),yarray(3000),inx,retflg,lbpts
+	NUMBER/	ang0,ang1,ang2,PI
+	ENTITY/ points(3000),lbspl
+
+$$	Define PI
+	PI = 4.0*ATANF(1.0)
+
+$$	Get the filename, check return flag to make sure we should continue
+	CALL/ '_getfilename',filename,retflg
+	IFTHEN/ retflg == 0
+		JUMP/ CANCEL:
+	ENDIF/
+
+$$	Use readdacsfile to read the data from the file
+	CALL/ '_readdacsfile',filename,numpts,xarray,yarray
+
+$$	Make sure some data was read 
+	IFTHEN/ numpts <= 0
+		JUMP/ CANCEL:
+	ENDIF/
+
+$$	XXXX Use only the first 360 points and use a closed spline
+	CALL/ '_atan2',yarray(1),xarray(1),ang0
+	DO/ DOLBL0:,inx,3,numpts,1
+		CALL/ '_atan2',yarray(inx-1),xarray(inx-1),ang1
+		CALL/ '_atan2',yarray(inx  ),xarray(inx  ),ang2
+		ang1 = ang1 - ang0
+		ang2 = ang2 - ang0
+		CALL/ '_putangleinrange',ang1
+		CALL/ '_putangleinrange',ang2
+$$ 	Make sure angles are within 10 degrees of ang0
+		IFTHEN/	ABSF(ang1) < 10.0*PI/180.0 AND ABSF(ang2) < 10.0*PI/180.0
+$$	Check that angle stradles start point 
+			IFTHEN/ ang1*ang2 <= 0.0
+				JUMP/ JMPLB0:
+			ENDIF/
+		ENDIF/
+	DOLBL0:
+
+$$	Jump here when last valid point has been found; set lbpts, erase
+$$      the "cross" over point and 1 more to make sure close spline works
+$$      OKAY 
+JMPLB0:
+	lbpts = inx - 2
+	
+$$	Create the points associated with the read data
+$$	Enter a DO/WHILE loop to create points, then spline the points */
+	DO/ DOLBL1:, inx,1,lbpts,1
+		points(inx) = POINT/ xarray(inx),yarray(inx)
+	DOLBL1:
+
+$$	Create the lobe spline 
+	lbspl = SPLINE/ CLOSED,points(1 .. lbpts)
+
+$$	Enter a DO/WHILE loop to delete points */
+	DO/ DOLBL2:, inx,1,lbpts,1
+		DELETE/ points(inx)
+	DOLBL2:
+
+$$ 	AUTOSCALE
+	VIEWE/AUTO
+
+$$ 	End of program
+CANCEL:
+	HALT

@@ -1,0 +1,52 @@
+Overview
+
+  The build environment is heavily dependent on the directory structure
+    Variables are defined in the build.bat file but the structure is fixed
+  Depends on UGII_ROOT_DIR variable set in the system or shell
+
+
+Building the grip programs
+
+  1) Open a command prompt
+  2) CD to the make folder
+  3) run the 'build.bat' program
+    A series of command prompts will open as each application is compiled
+
+
+The build environment
+
+  The directories consist of:
+     'compiled'
+     'make'
+     'source'
+
+  Compiled directory will contain all the compiled grip programs after the build.bat is executed
+
+  Make directory has the build.bat program that executes each applications build located in the source folder
+
+  Source folder has a common folder for all utilities shared source
+    In the source folder will contain a folder of each applications name (This will be the name of the grx file)
+      Each of application folder will have the source and a build.txt file
+      The build.txt file lists all the dependencies for application and the last line must be the main programs name
+
+
+How it works
+
+  When you execute the build.bat program it will list all the directories in the source folder
+    If a file name called build.txt exists in the folder it will then compile and build each line the build.txt file
+    During the compiling state it looks to see if the grip is a common source, then copies it to that folder to make it work for the grip program to link later on
+      Since compiling takes a few seconds to complete and we can link until it's done we recursively loop until it is complete
+    Cleanup the grs files in the application folder if it is a common source (so not to confuse where the master copy is)
+    
+    Linking the application with the NX gripbatch.bat program, using the last line in the build.txt file
+
+    Moving the executable to the compiled directory. Since linking takes a few seconds we again recursively loop until the applicationName.grx exists and moves it to the compiled directory
+
+
+Optional parameters
+
+   When running the build.bat program it has one optional parameter CLEAN
+      This will delete all the *.gri files in the all of the directories and quit
+      Use this if you want to do a completely clean build.
+      Since the program waits until a gri file is found before continuing, if a gri already exists it will link with the existing file
+         Good to do when upgrading to a new version of NX or new common library
