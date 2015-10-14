@@ -8,12 +8,6 @@ $$		points and spline that go with it. It makes use of the	$$
 $$		procedure 'readdacsfile'.				$$
 $$									$$
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-$$									$$
-$$	FILE:	camlobespl.grs						$$
-$$									$$
-$$	AUTHOR:	Frank Schipperijn					$$
-$$									$$
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 $$
 $$	DECLARE ALL REAL VARIABLES 
